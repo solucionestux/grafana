@@ -75,7 +75,29 @@ select:-webkit-autofill:focus {
   align-items: stretch;
   flex-direction: column;
   position: relative;
+  justify-content: center;
   z-index: 1;
+  opacity: 100;
+  transform: translate(0px);
+  transition: 0.25s ease;
+
+  &.add {
+    opacity: 0;
+    transform: translate(-200px);
+
+    &.hidden {
+      display: none;
+    }
+  }
+
+  &.remove {
+    opacity: 0;
+    transform: translate(175px);
+
+    &.hidden {
+      display: none;
+    }
+  }
 }
 
 .login-branding {
