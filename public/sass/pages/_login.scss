@@ -148,11 +148,13 @@ select:-webkit-autofill:focus {
   margin-bottom: 3rem;
 }
 
-.login-change-password h5,
-p {
-  text-align: left;
-}
+.login-change-password-info {
+  padding-bottom: 1.5rem;
 
+  & h5 {
+    text-align: left;
+  }
+}
 .btn-signup {
   color: $white;
   border: 1px solid $login-border;
