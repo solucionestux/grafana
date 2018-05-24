@@ -59,6 +59,14 @@ select:-webkit-autofill:focus {
   justify-content: space-between;
   width: 100%;
   margin-top: 0.5rem;
+
+  &--right {
+    justify-content: flex-end;
+
+    & .btn {
+      margin-left: 1rem;
+    }
+  }
 }
 
 .login-button-forgot-password {
@@ -77,27 +85,7 @@ select:-webkit-autofill:focus {
   position: relative;
   justify-content: center;
   z-index: 1;
-  opacity: 100;
-  transform: translate(0px);
-  transition: 0.25s ease;
-
-  &.add {
-    opacity: 0;
-    transform: translate(-200px);
-
-    &.hidden {
-      display: none;
-    }
-  }
-
-  &.remove {
-    opacity: 0;
-    transform: translate(175px);
-
-    &.hidden {
-      display: none;
-    }
-  }
+  height: 320px;
 }
 
 .login-branding {
@@ -122,6 +110,11 @@ select:-webkit-autofill:focus {
   }
 }
 
+.login-outer-box {
+  display: flex;
+  overflow-y: hidden;
+}
+
 .login-inner-box {
   text-align: center;
   padding: 2rem 4rem;
@@ -131,12 +124,33 @@ select:-webkit-autofill:focus {
   justify-content: center;
   flex-grow: 1;
   max-width: 415px;
+  transform: tranlate(0px, 0px);
+  transition: 0.25s ease;
+
+  &.add {
+    transform: translate(0px, -320px);
+    &.hidden {
+      display: none;
+    }
+  }
+
+  &.remove {
+    transform: translate(0px, 320px);
+    &.hidden {
+      display: none;
+    }
+  }
 }
 
 .login-tab-header {
   background: $tight-form-bg;
   text-align: center;
   margin-bottom: 3rem;
+}
+
+.login-change-password h5,
+p {
+  text-align: left;
 }
 
 .btn-signup {
