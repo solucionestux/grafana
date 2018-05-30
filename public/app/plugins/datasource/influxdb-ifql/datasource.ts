@@ -22,7 +22,7 @@ export default class InfluxDatasource {
 
   /** @ngInject */
   constructor(instanceSettings, private $q, private backendSrv, private templateSrv) {
-    this.type = 'influxdb';
+    this.type = 'influxdb-ifql';
     this.urls = _.map(instanceSettings.url.split(','), function(url) {
       return url.trim();
     });
@@ -213,11 +213,14 @@ export default class InfluxDatasource {
 
     return this._influxRequest('POST', '/query?orgName=defaultorgname', { q: query })
       .then(res => {
-        let error = _.get(res, 'results[0].error');
-        if (error) {
-          return { status: 'error', message: error };
+        if (res && res.trim()) {
+          return { status: 'success', message: 'Data source connected and database found.' };
         }
-        return { status: 'success', message: 'Data source is working' };
+        return {
+          status: 'error',
+          message:
+            'Data source connected, but has no data. Verify the "Database" field and make sure the database has data.',
+        };
       })
       .catch(err => {
         return { status: 'error', message: err.message };
@@ -241,10 +244,9 @@ export default class InfluxDatasource {
       params.db = this.database;
     }
 
-    if (method === 'GET') {
-      _.extend(params, data);
-      data = null;
-    }
+    // data sent as GET param
+    _.extend(params, data);
+    data = null;
 
     let req: any = {
       method: method,
@@ -252,7 +254,7 @@ export default class InfluxDatasource {
       params: params,
       data: data,
       precision: 'ms',
-      inspect: { type: 'influxdb' },
+      inspect: { type: this.type },
       paramSerializer: this.serializeParams,
     };
 
