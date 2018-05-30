@@ -57,16 +57,15 @@ export class LoginCtrl {
         changePasswordView.classList.remove('remove');
       }, 301);
 
-      console.log(document.getElementById('#newPassword'));
       setTimeout(() => {
-        $scope.inputFocus();
-      }, 5000);
+        //$scope.inputFocus();
+        document.getElementById('newPassword').focus();
+      }, 400);
     };
 
-    $scope.inputFocus = function() {
-      console.log(document.getElementById('#newPassword'));
-      document.getElementById('#newPassword').focus();
-    };
+    /*$scope.inputFocus = function() {
+      document.getElementById('newPassword').focus();
+    };*/
 
     $scope.changePassword = function() {
       $scope.command.oldPassword = 'admin';
