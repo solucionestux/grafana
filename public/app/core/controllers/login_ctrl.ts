@@ -18,6 +18,7 @@ export class LoginCtrl {
 
     $scope.oauth = config.oauth;
     $scope.oauthEnabled = _.keys(config.oauth).length > 0;
+    $scope.ldapEnabled = config.ldapEnabled;
 
     $scope.disableLoginForm = config.disableLoginForm;
     $scope.disableUserSignUp = config.disableUserSignUp;
@@ -58,14 +59,9 @@ export class LoginCtrl {
       }, 301);
 
       setTimeout(() => {
-        //$scope.inputFocus();
         document.getElementById('newPassword').focus();
       }, 400);
     };
-
-    /*$scope.inputFocus = function() {
-      document.getElementById('newPassword').focus();
-    };*/
 
     $scope.changePassword = function() {
       $scope.command.oldPassword = 'admin';
@@ -112,12 +108,11 @@ export class LoginCtrl {
       backendSrv.post('/login', $scope.formModel).then(function(result) {
         $scope.result = result;
 
-        if ($scope.formModel.password === 'admin') {
-          $scope.changeView();
+        if ($scope.formModel.password !== 'admin' || $scope.ldapEnabled) {
+          $scope.toGrafana();
           return;
         }
-
-        $scope.toGrafana();
+        $scope.changeView();
       });
     };
 
