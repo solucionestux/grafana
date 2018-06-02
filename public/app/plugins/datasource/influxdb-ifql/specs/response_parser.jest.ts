@@ -1,133 +1,29 @@
-import _ from 'lodash';
-import ResponseParser from '../response_parser';
+import { parseResults, getTableModelFromResult, getTimeSeriesFromResult } from '../response_parser';
+import response from './sample_response_csv';
 
-describe('influxdb response parser', () => {
-  const parser = new ResponseParser();
-
-  describe('SHOW TAG response', () => {
-    var query = 'SHOW TAG KEYS FROM "cpu"';
-    var response = {
-      results: [
-        {
-          series: [
-            {
-              name: 'cpu',
-              columns: ['tagKey'],
-              values: [['datacenter'], ['hostname'], ['source']],
-            },
-          ],
-        },
-      ],
-    };
-
-    var result = parser.parse(query, response);
-
+describe('influxdb ifql response parser', () => {
+  describe('parseResults()', () => {
     it('expects three results', () => {
-      expect(_.size(result)).toBe(3);
+      const results = parseResults(response);
+      expect(results.length).toBe(14);
     });
   });
 
-  describe('SHOW TAG VALUES response', () => {
-    var query = 'SHOW TAG VALUES FROM "cpu" WITH KEY = "hostname"';
-
-    describe('response from 0.10.0', () => {
-      var response = {
-        results: [
-          {
-            series: [
-              {
-                name: 'hostnameTagValues',
-                columns: ['hostname'],
-                values: [['server1'], ['server2'], ['server2']],
-              },
-            ],
-          },
-        ],
-      };
-
-      var result = parser.parse(query, response);
-
-      it('should get two responses', () => {
-        expect(_.size(result)).toBe(2);
-        expect(result[0].text).toBe('server1');
-        expect(result[1].text).toBe('server2');
-      });
-    });
-
-    describe('response from 0.12.0', () => {
-      var response = {
-        results: [
-          {
-            series: [
-              {
-                name: 'cpu',
-                columns: ['key', 'value'],
-                values: [['source', 'site'], ['source', 'api']],
-              },
-              {
-                name: 'logins',
-                columns: ['key', 'value'],
-                values: [['source', 'site'], ['source', 'webapi']],
-              },
-            ],
-          },
-        ],
-      };
-
-      var result = parser.parse(query, response);
-
-      it('should get two responses', () => {
-        expect(_.size(result)).toBe(3);
-        expect(result[0].text).toBe('site');
-        expect(result[1].text).toBe('api');
-        expect(result[2].text).toBe('webapi');
-      });
+  describe('getTableModelFromResult()', () => {
+    it('expects a table model', () => {
+      const results = parseResults(response);
+      const table = getTableModelFromResult(results[0]);
+      expect(table.columns.length).toBe(6);
+      expect(table.rows.length).toBe(300);
     });
   });
 
-  describe('SHOW FIELD response', () => {
-    var query = 'SHOW FIELD KEYS FROM "cpu"';
-    describe('response from 0.10.0', () => {
-      var response = {
-        results: [
-          {
-            series: [
-              {
-                name: 'measurements',
-                columns: ['name'],
-                values: [['cpu'], ['derivative'], ['logins.count'], ['logs'], ['payment.ended'], ['payment.started']],
-              },
-            ],
-          },
-        ],
-      };
-
-      var result = parser.parse(query, response);
-      it('should get two responses', () => {
-        expect(_.size(result)).toBe(6);
-      });
-    });
-
-    describe('response from 0.11.0', () => {
-      var response = {
-        results: [
-          {
-            series: [
-              {
-                name: 'cpu',
-                columns: ['fieldKey'],
-                values: [['value']],
-              },
-            ],
-          },
-        ],
-      };
-
-      var result = parser.parse(query, response);
-
-      it('should get two responses', () => {
-        expect(_.size(result)).toBe(1);
-      });
+  describe('getTimeSeriesFromResult()', () => {
+    it('expects time series', () => {
+      const results = parseResults(response);
+      const series = getTimeSeriesFromResult(results[0]);
+      expect(series.length).toBe(50);
+      expect(series[0].datapoints.length).toBe(6);
     });
   });
 });
