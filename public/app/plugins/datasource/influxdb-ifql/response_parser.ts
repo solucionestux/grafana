@@ -5,18 +5,32 @@ import TableModel from 'app/core/table_model';
 
 const filterColumnKeys = key => key && key[0] !== '_' && key !== 'result' && key !== 'table';
 
+const IGNORE_FIELDS_FOR_NAME = ['result', '', 'table'];
+export const getNameFromRecord = record => {
+  // Measurement and field
+  const metric = [record._measurement, record._field];
+
+  // Add tags
+  const tags = Object.keys(record)
+    .filter(key => key[0] !== '_')
+    .filter(key => IGNORE_FIELDS_FOR_NAME.indexOf(key) === -1)
+    .map(key => `${key}=${record[key]}`);
+
+  return [...metric, ...tags].join(' ');
+};
+
 const parseCSV = (input: string) =>
   Papa.parse(input, {
     header: true,
     comments: '#',
   }).data;
 
-const parseValue = (input: string) => {
+export const parseValue = (input: string) => {
   const value = parseFloat(input);
   return isNaN(value) ? null : value;
 };
 
-const parseTime = (input: string) => Date.parse(input);
+export const parseTime = (input: string) => Date.parse(input);
 
 export function parseResults(response: string): any[] {
   return response.trim().split(/\n\s*\s/);
@@ -66,7 +80,7 @@ export function getTimeSeriesFromResult(result: string) {
     .map(id => tables[id])
     .map(series => {
       const datapoints = series.map(record => [parseValue(record._value), parseTime(record._time)]);
-      const alias = series[0].table;
+      const alias = getNameFromRecord(series[0]);
       return { datapoints, target: alias };
     });
 
